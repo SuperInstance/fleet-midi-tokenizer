@@ -2,7 +2,7 @@
 
 # 🔤 fleet-midi-tokenizer
 
-> *REMI MIDI tokenization — the fleet's musical lingua franca*
+> *REMI MIDI tokenization — the fleet musical lingua franca*
 
 [![CI](https://img.shields.io/github/actions/workflow/status/SuperInstance/fleet-midi-tokenizer/ci.yml?style=flat-square&logo=github&label=CI)](https://github.com/SuperInstance/fleet-midi-tokenizer/actions)
 [![npm](https://img.shields.io/badge/npm-%40superinstance%2Fmidi--tokenizer-cb3837?style=flat-square&logo=npm)](https://www.npmjs.com/package/@superinstance/midi-tokenizer)
@@ -12,7 +12,7 @@
 
 ---
 
-Encodes Standard MIDI Format 1 files into REMI-style token sequences (H, T, K, S, E, N, F) and decodes them back to playable MIDI. Every agent can reason about music through tokens. Zero-dep CLI tool with JSON schema validation for fleet protocol.
+Encodes Standard MIDI Format 1 files into REMI-style token sequences (H, T, K, S, E, N, F) and decodes them back to playable MIDI. Every agent can reason about music through tokens. Zero-dep CLI tool with JSON schema validation.
 
 ---
 
@@ -32,22 +32,60 @@ git clone https://github.com/SuperInstance/fleet-midi-tokenizer.git
 ## 🚀 Quick Start
 
 ```bash
-# see Getting Started below
+# Encode MIDI → tokens:
+node lib/tokenizer.js tokenize path/to/file.mid
+
+# Decode tokens → MIDI:
+node -e "const t=require(\"./lib/tokenizer\"); const r=t.tokenize(\"file.mid\"); const out=t.decode(r.tokens); console.log(\"Decoded:\",out);"
+
+# Programmatic:
+const { tokenize, decode } = require("@superinstance/midi-tokenizer");
+const result = tokenize("output.mid");
+console.log(result.count + " tokens, " + result.tracks + " tracks");
 ```
 
 ## 🏗️ Architecture
 
 ```
-Coming soon
+┌──────────────────────────────────────────────────────────┐
+│                                                          │
+│   MIDI File (.mid)              Token Sequence            │
+│          │                              ▲                │
+│          ▼                              │                │
+│   ┌──────────┐    ┌──────────┐    ┌──────────┐           │
+│   │ music21  │───▶│ Tokenizer│───▶│ music21  │           │
+│   │ Parse    │    │ Encode   │    │ Build    │           │
+│   └──────────┘    └──────────┘    └──────────┘           │
+│          │              │              ▲                   │
+│          ▼              ▼              │                   │
+│   Events           REMI Tokens      MIDI File             │
+│   (notes,          [H:..., T:...,    (.mid)              │
+│    tempo,           K:..., S:...,    round-trip           │
+│    key,             E:..., N:...,    verified             │
+│    tracks)          F:...]                               │
+│                                                          │
+│   Token types: H(header) T(tempo) K(key) S(time)         │
+│                E(track) N(note on) F(note off)            │
+└──────────────────────────────────────────────────────────┘
 ```
 
 ## 📡 API
 
-See source code for endpoints.
+### `tokenize(midiPath)` → TokenSequence
+Parses a Standard MIDI Format 1 file and returns REMI token structure.
+
+### `decode(tokens)` → MIDI file path
+Reconstructs a playable MIDI file from a token sequence.
+
+### CLI Usage
+```bash
+node lib/tokenizer.js tokenize file.mid
+node lib/tokenizer.js decode "$(cat tokens.json)"
+```
 
 ## 🧪 Beta Tested
 
-Part of the [SuperInstance MIDI Fleet](https://github.com/SuperInstance/construct-coordination/blob/main/FLEET_MIDI.md). Zeroshot-verified on every push via CI.
+Part of the [SuperInstance MIDI Fleet](https://github.com/SuperInstance/construct-coordination/blob/main/FLEET_MIDI.md). Every push verified via CI — zeroshot tests ensure zero-config operation out of the box.
 
 ## 🤝 Related
 
