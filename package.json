@@ -1,0 +1,15 @@
+{
+  "name": "@superinstance/midi-tokenizer",
+  "version": "0.1.0",
+  "description": "REMI MIDI tokenizer for the SuperInstance fleet. MIDI ↔ ternary token sequences for fleet transport.",
+  "main": "lib/tokenizer.js",
+  "scripts": {
+    "test": "node lib/tokenizer.js tokenize test/test.mid",
+    "decode": "node lib/decode.js"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": { "type": "git", "url": "git+https://github.com/SuperInstance/fleet-midi-tokenizer.git" }
+}
